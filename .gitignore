@@ -1,0 +1,15 @@
+.env
+.DS_Store
+__pycache__/
+*.pyc
+node_modules/
+dist/
+build/
+data/outputs/*
+!data/outputs/.gitkeep
+data/temp/*
+!data/temp/.gitkeep
+data/cache/*
+!data/cache/.gitkeep
+models/*
+!models/README.md

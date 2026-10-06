@@ -1,0 +1,94 @@
+version: '3.8'
+
+services:
+  gateway:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./gateway/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - sandbox_net
+    depends_on:
+      - web
+      - sandbox-api
+      - open-webui
+
+  web:
+    build:
+      context: ./web
+    networks:
+      - sandbox_net
+    restart: unless-stopped
+
+  sandbox-api:
+    build:
+      context: ./sandbox-api
+    networks:
+      - sandbox_net
+    environment:
+      - VLM_ENDPOINT=http://vlm:8000
+      - COMFY_ENDPOINT=http://comfyui:8188
+    volumes:
+      - ./data/outputs:/app/data/outputs
+      - ./data/temp:/app/data/temp
+    restart: unless-stopped
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    environment:
+      - OPENAI_API_BASE_URL=http://vlm:8000/v1
+      - OPENAI_API_KEY=local
+    networks:
+      - sandbox_net
+    volumes:
+      - openwebui_data:/app/backend/data
+    restart: unless-stopped
+
+  vlm:
+    image: vllm/vllm-openai:latest
+    profiles: ["gpu"]
+    runtime: nvidia
+    environment:
+      - HUGGING_FACE_HUB_TOKEN=${HF_TOKEN}
+    command: --model meta-llama/Llama-3.2-11B-Vision-Instruct
+    networks:
+      - sandbox_net
+    volumes:
+      - ./models:/models
+      - hf_cache:/root/.cache/huggingface
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+
+  comfyui:
+    image: yanwk/comfyui-boot:latest
+    profiles: ["gpu"]
+    runtime: nvidia
+    networks:
+      - sandbox_net
+    volumes:
+      - ./models:/models
+      - ./data/outputs:/outputs
+      - ./comfy/workflows:/workflows
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+
+networks:
+  sandbox_net:
+    driver: bridge
+
+volumes:
+  hf_cache:
+  openwebui_data:
