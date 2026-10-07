@@ -1,5 +1,9 @@
 import threading
 import time
+import requests
+import os
+
+VLM_ENDPOINT = os.getenv("VLM_ENDPOINT", "http://vlm:8000")
 
 class GPUResourceManager:
     def __init__(self):
@@ -9,31 +13,46 @@ class GPUResourceManager:
         self.vram_used = 0.0
 
     def acquire_vlm(self):
-        with self.lock:
+        """Acquire the GPU lock for VLM inference."""
+        self.lock.acquire()
+        try:
             if self.current_owner != "VLM":
-                print("Switching GPU context to VLM...")
-                # TODO: Implement model load/unload
-                time.sleep(1) # mock switch time
+                print("GPU Manager: Switching context to VLM...")
+                # In sequential mode, we would offload FLUX here if needed.
                 self.current_owner = "VLM"
-                self.vram_used = 22.0
+                self.vram_used = 22.0 # Approximation for Llama 3.2 11B Vision
             return True
+        except Exception as e:
+            print(f"Error acquiring VLM: {e}")
+            self.lock.release()
+            return False
 
     def release_vlm(self):
-        # We might keep it resident based on policy
-        pass
+        """Release the GPU lock for VLM inference."""
+        # For sequential/aggressive offload policies, we might unload the model here.
+        self.lock.release()
 
     def acquire_image(self):
-        with self.lock:
+        """Acquire the GPU lock for Image generation."""
+        self.lock.acquire()
+        try:
             if self.current_owner != "IMAGE":
-                print("Switching GPU context to IMAGE...")
-                # TODO: Implement model load/unload
-                time.sleep(1) # mock switch time
+                print("GPU Manager: Switching context to IMAGE (ComfyUI)...")
+                # In sequential mode, we would offload VLM here.
+                # (e.g., unload vLLM models from VRAM)
                 self.current_owner = "IMAGE"
-                self.vram_used = 24.0
+                self.vram_used = 24.0 # Approximation for FLUX Schnell
             return True
+        except Exception as e:
+            print(f"Error acquiring IMAGE: {e}")
+            self.lock.release()
+            return False
             
     def release_image(self):
-        pass
+        """Release the GPU lock for Image generation."""
+        # For sequential policies, we might trigger a ComfyUI memory wipe here.
+        # requests.get(f"{COMFY_ENDPOINT}/free") # Pseudo-code
+        self.lock.release()
         
     def status(self):
         return {

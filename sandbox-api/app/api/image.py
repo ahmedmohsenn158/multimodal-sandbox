@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-import uuid
-import time
+from app.safety.sanitizer import PromptSanitizer
+from app.comfy.queue import image_queue
 
 router = APIRouter()
 
@@ -11,36 +11,35 @@ class ImageRequest(BaseModel):
     height: int = 1024
     seed: int = -1
 
-# Dummy in-memory store for phase 1 mock
-JOBS = {}
-
-from app.safety.sanitizer import PromptSanitizer
-
 @router.post("/generate")
 def generate_image(request: ImageRequest):
+    # Safety Check Layer
     safety_result = PromptSanitizer.is_allowed(request.prompt)
     if not safety_result["allowed"]:
         raise HTTPException(status_code=400, detail=safety_result["reason"])
 
-    job_id = str(uuid.uuid4())[:8]
-    JOBS[job_id] = {
-        "job_id": job_id,
-        "status": "queued",
-        "request": request.model_dump(),
-        "created_at": time.time()
-    }
+    job_id = image_queue.add_job(request.model_dump())
+    
     return {"job_id": job_id, "status": "queued"}
 
 @router.get("/jobs/{job_id}")
 def get_job_status(job_id: str):
-    job = JOBS.get(job_id)
+    job = image_queue.get_job(job_id)
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
     
-    # Mock completion
-    if job["status"] == "queued" and (time.time() - job["created_at"] > 2):
-        job["status"] = "completed"
-        job["image_url"] = f"/data/outputs/{job_id}.png"
-        job["generation_time"] = time.time() - job["created_at"]
-
-    return job
+    # Calculate queue position if it's queued
+    position = -1
+    if job["status"] in ["queued", "waiting_for_gpu"]:
+        try:
+            position = image_queue.queue.index(job_id) + 1
+        except ValueError:
+            pass
+            
+    return {
+        "job_id": job["job_id"],
+        "status": job["status"],
+        "image_url": job.get("image_url"),
+        "error": job.get("error"),
+        "queue_position": position
+    }
