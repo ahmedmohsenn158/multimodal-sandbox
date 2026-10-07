@@ -66,14 +66,15 @@ services:
     restart: unless-stopped
 
   comfyui:
-    image: yanwk/comfyui-boot:latest
+    build:
+      context: ./comfy
     profiles: ["gpu"]
     runtime: nvidia
     networks:
       - sandbox_net
     volumes:
-      - ./models:/models
-      - ./data/outputs:/outputs
+      - ./models:/app/models/checkpoints
+      - ./data/outputs:/app/output
       - ./comfy/workflows:/workflows
     deploy:
       resources:

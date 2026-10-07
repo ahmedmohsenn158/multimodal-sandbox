@@ -17,7 +17,7 @@
   },
   "4": {
     "inputs": {
-      "ckpt_name": "flux1-schnell.sft"
+      "ckpt_name": "FLUX.1-schnell/flux1-schnell.safetensors"
     },
     "class_type": "CheckpointLoaderSimple",
     "_meta": { "title": "Load Checkpoint" }
