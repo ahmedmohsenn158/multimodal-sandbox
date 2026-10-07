@@ -24,19 +24,19 @@ read -p "Press Enter to continue..."
 echo ""
 echo "Downloading Llama 3.2 11B Vision..."
 
-"../.venv/Scripts/hf.exe" download \
-    meta-llama/Llama-3.2-11B-Vision-Instruct \
-    --local-dir "../models/Llama-3.2-11B-Vision-Instruct" \
-    --token "$HF_TOKEN"
+# "../.venv/Scripts/hf.exe" download \
+#     meta-llama/Llama-3.2-11B-Vision-Instruct \
+#     --local-dir "../models/Llama-3.2-11B-Vision-Instruct" \
+#     --token "$HF_TOKEN"
 
-echo "Verifying Llama model files..."
+# echo "Verifying Llama model files..."
 
-if [ ! -d "../models/Llama-3.2-11B-Vision-Instruct" ]; then
-    echo "Error: Llama model files not found."
-    exit 1
-fi
+# if [ ! -d "../models/Llama-3.2-11B-Vision-Instruct" ]; then
+#     echo "Error: Llama model files not found."
+#     exit 1
+# fi
 
-echo "Llama download complete."
+# echo "Llama download complete."
 
 echo ""
 echo "Downloading FLUX.1-schnell..."

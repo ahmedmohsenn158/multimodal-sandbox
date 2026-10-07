@@ -44,26 +44,26 @@ services:
       - openwebui_data:/app/backend/data
     restart: unless-stopped
 
-  vlm:
-    image: vllm/vllm-openai:latest
-    profiles: ["gpu"]
-    runtime: nvidia
-    environment:
-      - HUGGING_FACE_HUB_TOKEN=${HF_TOKEN}
-    command: --model meta-llama/Llama-3.2-11B-Vision-Instruct
-    networks:
-      - sandbox_net
-    volumes:
-      - ./models:/models
-      - hf_cache:/root/.cache/huggingface
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
-    restart: unless-stopped
+  # vlm:
+  #   image: vllm/vllm-openai:latest
+  #   profiles: ["gpu"]
+  #   runtime: nvidia
+  #   environment:
+  #     - HUGGING_FACE_HUB_TOKEN=${HF_TOKEN}
+  #   command: --model meta-llama/Llama-3.2-11B-Vision-Instruct
+  #   networks:
+  #     - sandbox_net
+  #   volumes:
+  #     - ./models:/models
+  #     - hf_cache:/root/.cache/huggingface
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: 1
+  #             capabilities: [gpu]
+  #   restart: unless-stopped
 
   comfyui:
     build:
