@@ -40,12 +40,15 @@ class ComfyClient:
         # Submit prompt to ComfyUI
         payload = {"prompt": workflow}
         try:
-            r = requests.post(f"{self.base_url}/prompt", json=payload)
+            r = requests.post(f"{self.base_url}/prompt", json=payload, timeout=5)
             r.raise_for_status()
             data = r.json()
             prompt_id = data.get("prompt_id")
             
             return {"status": "success", "prompt_id": prompt_id}
+        except requests.exceptions.Timeout:
+            print("Error: ComfyUI request timed out. Is the ComfyUI container running?")
+            return {"status": "error", "message": "ComfyUI connection timed out."}
         except Exception as e:
             print(f"Error submitting to ComfyUI: {e}")
             return {"status": "error", "message": str(e)}
