@@ -27,12 +27,22 @@ export default function ImageStudio() {
 
   const pollStatus = async (jobId) => {
     const interval = setInterval(async () => {
-      const res = await fetch(`/api/image/jobs/${jobId}`);
-      const data = await res.json();
-      if (data.status === 'completed') {
+      try {
+        const res = await fetch(`/api/image/jobs/${jobId}`);
+        const data = await res.json();
+        if (data.status === 'completed') {
+          clearInterval(interval);
+          setImageUrl(data.image_url);
+          setStatus('done');
+        } else if (data.status === 'error') {
+          clearInterval(interval);
+          setStatus('idle');
+          alert('Generation failed: ' + (data.error || 'Unknown error'));
+        }
+      } catch (err) {
         clearInterval(interval);
-        setImageUrl(data.image_url);
-        setStatus('done');
+        setStatus('idle');
+        alert('Network error while polling status');
       }
     }, 1000);
   };
@@ -63,8 +73,8 @@ export default function ImageStudio() {
       {status === 'done' && imageUrl && (
         <div style={{ marginTop: '2rem', border: '1px solid #ccc', padding: '1rem', textAlign: 'center' }}>
           <h3>Generated Image</h3>
-          <div style={{ width: '100%', height: '300px', backgroundColor: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '1rem 0' }}>
-            <span style={{ color: '#999' }}>[Image Placeholder: {imageUrl}]</span>
+          <div style={{ width: '100%', minHeight: '300px', backgroundColor: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '1rem 0', overflow: 'hidden' }}>
+            <img src={imageUrl} alt="Generated" style={{ maxWidth: '100%', maxHeight: '512px', objectFit: 'contain' }} />
           </div>
           <button onClick={() => setStatus('idle')} style={{ marginRight: '1rem' }}>Regenerate</button>
           <button>Download</button>
