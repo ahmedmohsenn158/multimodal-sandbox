@@ -39,17 +39,18 @@ echo "Downloading Llama 3.2 11B Vision..."
 # echo "Llama download complete."
 
 echo ""
-echo "Downloading FLUX.1-schnell..."
+echo "Downloading FLUX.1-schnell (All-in-one FP8 checkpoint)..."
 
 "../.venv/Scripts/hf.exe" download \
-    black-forest-labs/FLUX.1-schnell \
-    --local-dir "../models/FLUX.1-schnell" \
+    Comfy-Org/flux1-schnell \
+    flux1-schnell-fp8.safetensors \
+    --local-dir "../models" \
     --token "$HF_TOKEN"
 
 echo "Verifying FLUX model files..."
 
-if [ ! -d "../models/FLUX.1-schnell" ]; then
-    echo "Error: FLUX model files not found."
+if [ ! -f "../models/flux1-schnell-fp8.safetensors" ]; then
+    echo "Error: FLUX model file not found."
     exit 1
 fi
 
@@ -58,5 +59,5 @@ echo "FLUX download complete."
 echo ""
 echo "Storage requirements:"
 echo "Llama 3.2 11B Vision: ~22GB"
-echo "FLUX.1-schnell: ~24GB"
-echo "Total expected: ~46GB"
+echo "FLUX.1-schnell (FP8): ~17GB"
+echo "Total expected: ~39GB"
