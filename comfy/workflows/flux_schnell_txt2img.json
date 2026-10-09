@@ -1,26 +1,26 @@
 {
   "3": {
     "inputs": {
-      "seed": -1,
+      "seed": 0,
       "steps": 4,
-      "cfg": 1,
+      "cfg": 1.0,
       "sampler_name": "euler",
       "scheduler": "simple",
-      "denoise": 1,
-      "model": [ "11", 0 ],
-      "positive": [ "6", 0 ],
-      "negative": [ "7", 0 ],
-      "latent_image": [ "5", 0 ]
+      "denoise": 1.0,
+      "model": ["11", 0],
+      "positive": ["6", 0],
+      "negative": ["7", 0],
+      "latent_image": ["5", 0]
     },
     "class_type": "KSampler",
-    "_meta": { "title": "KSampler" }
+    "_meta": {"title": "KSampler"}
   },
   "4": {
     "inputs": {
       "ckpt_name": "flux1-schnell-fp8.safetensors"
     },
     "class_type": "CheckpointLoaderSimple",
-    "_meta": { "title": "Load Checkpoint" }
+    "_meta": {"title": "Load FLUX.1-schnell FP8 checkpoint"}
   },
   "5": {
     "inputs": {
@@ -29,46 +29,49 @@
       "batch_size": 1
     },
     "class_type": "EmptyLatentImage",
-    "_meta": { "title": "Empty Latent Image" }
+    "_meta": {"title": "Empty Latent Image"}
   },
   "6": {
     "inputs": {
       "text": "A futuristic library in Cairo at sunset",
-      "clip": [ "4", 1 ]
+      "clip": ["4", 1]
     },
     "class_type": "CLIPTextEncode",
-    "_meta": { "title": "CLIP Text Encode (Prompt)" }
+    "_meta": {"title": "CLIP Text Encode (Positive Prompt)"}
   },
   "7": {
     "inputs": {
       "text": "",
-      "clip": [ "4", 1 ]
+      "clip": ["4", 1]
     },
     "class_type": "CLIPTextEncode",
-    "_meta": { "title": "CLIP Text Encode (Negative Prompt)" }
+    "_meta": {"title": "CLIP Text Encode (Negative Prompt)"}
   },
   "8": {
     "inputs": {
-      "samples": [ "3", 0 ],
-      "vae": [ "4", 2 ]
+      "samples": ["3", 0],
+      "vae": ["4", 2]
     },
     "class_type": "VAEDecode",
-    "_meta": { "title": "VAE Decode" }
+    "_meta": {"title": "VAE Decode"}
   },
   "9": {
     "inputs": {
-      "filename_prefix": "flux",
-      "images": [ "8", 0 ]
+      "filename_prefix": "sandbox/flux",
+      "images": ["8", 0]
     },
     "class_type": "SaveImage",
-    "_meta": { "title": "Save Image" }
+    "_meta": {"title": "Save Image"}
   },
   "11": {
     "inputs": {
-      "weight": 1.0,
-      "model": [ "4", 0 ]
+      "max_shift": 1.15,
+      "base_shift": 0.5,
+      "width": 1024,
+      "height": 1024,
+      "model": ["4", 0]
     },
     "class_type": "ModelSamplingFlux",
-    "_meta": { "title": "ModelSamplingFlux" }
+    "_meta": {"title": "ModelSamplingFlux"}
   }
 }
