@@ -31,6 +31,7 @@ services:
     volumes:
       - ./data/outputs:/app/data/outputs
       - ./data/temp:/app/data/temp
+      - ./comfy/workflows:/workflows:ro
     restart: unless-stopped
 
   open-webui:
