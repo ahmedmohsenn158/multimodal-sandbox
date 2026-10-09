@@ -14,5 +14,8 @@ BLOCKED_TERMS = [
     "blood",
     "bomb",
     "meth",
+    "sex",
+    "gay",
+    "lesbian",
     "kill"
 ]
